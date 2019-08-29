@@ -72,3 +72,61 @@ public class MySuccessHandler implements AuthenticationSuccessHandler
 
 ###  6   form表单提交不成功的原因
 
+###  7   JPA操作数据库
+JPA操作数据库需要先引入jpa的依赖，可以在建工程时直接引入，也可以在pom.xml中手动引入
+
+		<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+		<dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+然后新建一个类，用来和数据库的表进行映射,加注解@Entity
+
+
+    @Entity
+    @Data
+    public class userinfo {
+	    @Id
+	    @GeneratedValue
+	    private long id;
+	    String name;
+	    String password;    
+    }
+
+
+然后新建一个接口类，继承JpaRepository<userinfo,Long> ，其中有两个参数，第一个写这个接口类对应的数据类，就是刚才我们建的表类型，第二个参数就是主键类型，然后借助IDE自动生成一些接口
+
+    public interface userReposery  extends JpaRepository<userinfo,Long> {    
+		//声明get函数
+    	userinfo getByName(String name);  
+  		//声明sava函数
+	    @Override
+	    <S extends userinfo> S save(S s);
+    }
+
+接下来写controller函数接口
+
+	@Autowired
+    userReposery ur;
+ 	//查询
+    @GetMapping("/user")
+    public String user(){
+        userinfo myuser=ur.getByName("admin");
+        return myuser.getName();
+    }
+	//写入
+    @PostMapping("/user")
+    public String adduser(@Validated userinfo u){
+        /*userinfo a=new userinfo();
+        a.setName("admin");
+        a.setPassword("pss");*/
+        ur.save(u);
+        return "ok";
+    }
+POSTMAN写测试接口
+![](JPApost.jpg)
