@@ -13,7 +13,6 @@
 <body>
 <div class="container">
     <form class="form-signin" method="post" th:action="@{/login}">
-        <h2>请登录</h2>
         <h2 class="form-signin-heading">Please sign in</h2>
         <p>
             <label for="username" class="sr-only">Username</label>
@@ -23,12 +22,8 @@
             <label for="password" class="sr-only">Password</label>
             <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
         </p>
-        <tr>
-            <td colspan="2"><input type="checkbox" name="remember-me" value="true"/>记住我</td>
-        </tr>
         <input name="_csrf" type="hidden" value="ba0ca5e2-bcda-4d6f-ade2-503bb278c391" />
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-
     </form>
 </div>
 </body></html>

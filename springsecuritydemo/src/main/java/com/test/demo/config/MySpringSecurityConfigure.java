@@ -1,4 +1,5 @@
-package com.test.demo;
+/*
+package com.test.demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +41,8 @@ public class MySpringSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .permitAll();
-        /*http.authorizeRequests()
+        */
+/*http.authorizeRequests()
                 //.anyRequest().authenticated() //任何请求,登录后可以访问
                 .antMatchers("/hello").permitAll()
                 .anyRequest().authenticated()
@@ -50,10 +52,12 @@ public class MySpringSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/home")
                 .permitAll() //登录页面用户任意访问
                 .and()
-                .logout().permitAll(); //注销行为任意访问*/
+                .logout().permitAll(); //注销行为任意访问*//*
+
 
         // 范例
-       /* http.authorizeRequests()
+       */
+/* http.authorizeRequests()
                 //静态资源和一些所有人都能访问的请求
                 .antMatchers("/css/**","/staic/**", "/js/**","/images/**").permitAll()
                 .antMatchers("/", "/login","/session_expired").permitAll()
@@ -72,8 +76,10 @@ public class MySpringSecurityConfigure extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true)  //使session失效
                 .clearAuthentication(true)    //清除证信息
                 .and()
-                .httpBasic();*/
+                .httpBasic();*//*
+
     }
 
 
 }
+*/
