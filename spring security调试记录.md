@@ -1118,6 +1118,122 @@ spring:
     password: root
 ```
 
+#### **1  C       creat a record**
+
+```java
+User user=new User();
+user.setAge(12);
+user.setEmail("zhang@163.com");
+user.setName("zhangfengqi");
+userMapper.insert(user);
+```
+
+#### **2   R      redrieve a record**
+
+```java
+User user = userMapper.selectOne(new QueryWrapper<User>().eq("name", "zhangfengqi"));
+//或者
+User user = iuserService.lambdaQuery().eq(User::getName, name).list().get(0);
+```
+
+**(1)、**根据id查询：
+
+```undefined
+Employee employee = emplopyeeDao.selectById(1);
+```
+
+**(2)、**根据条件查询一条数据：
+
+```cpp
+Employee employeeCondition = new Employee();
+employeeCondition.setId(1);
+employeeCondition.setLastName("更新测试");
+//若是数据库中符合传入的条件的记录有多条，那就不能用这个方法，会报错
+Employee employee = emplopyeeDao.selectOne(employeeCondition);
+```
+
+**注：**这个方法的sql语句就是`where id = 1 and last_name = 更新测试`，若是符合这个条件的记录不止一条，那么就会报错。
+
+**(3)、**根据查询条件返回多条数据：
+当符合指定条件的记录数有多条时，上面那个方法就会报错，就应该用这个方法。
+
+```jsx
+Map<String,Object> columnMap = new HashMap<>();
+columnMap.put("last_name","东方不败");//写表中的列名
+columnMap.put("gender","1");
+List<Employee> employees = emplopyeeDao.selectByMap(columnMap);
+System.out.println(employees.size());
+```
+
+**注：**查询条件用map集合封装，columnMap，写的是数据表中的列名，而非实体类的属性名。比如属性名为lastName，数据表中字段为last_name，这里应该写的是last_name。selectByMap方法返回值用list集合接收。
+
+**(4)、**通过id批量查询：
+
+```csharp
+List<Integer> idList = new ArrayList<>();
+idList.add(1);
+idList.add(2);
+idList.add(3);
+List<Employee> employees = emplopyeeDao.selectBatchIds(idList);
+System.out.println(employees);
+```
+
+**注：**把需要查询的id都add到list集合中，然后调用selectBatchIds方法，传入该list集合即可，该方法返回的是对应id的所有记录，所有返回值也是用list接收。
+
+**(5)、**分页查询：
+
+```csharp
+List<Employee> employees = emplopyeeDao.selectPage(new Page<>(1,2),null);
+System.out.println(employees);
+```
+
+**注：**selectPage方法就是分页查询，在page中传入分页信息，后者为null的分页条件，这里先让其为null，讲了条件构造器再说其用法。这个分页其实并不是物理分页，而是内存分页。也就是说，查询的时候并没有limit语句。等配置了分页插件后才可以实现真正的分页。
+
+#### 3  U       update a record**
+
+```java
+@Test
+public void testUpdate(){
+        Employee employee = new Employee();
+        employee.setId(1);
+        employee.setLastName("更新测试");
+        //emplopyeeDao.updateById(employee);//根据id进行更新，没有传值的属性就不会更新
+        emplopyeeDao.updateAllColumnById(employee);//根据id进行更新，没传值的属性就更新为null
+}
+```
+
+**注：**注意这两个update操作的区别，`updateById`方法，没有传值的字段不会进行更新，比如只传入了lastName，那么age、gender等属性就会保留原来的值；`updateAllColumnById`方法，顾名思义，会更新所有的列，没有传值的列会更新为null。
+
+#### **4  D       delete a record**
+
+**(1)、**根据id删除：
+
+```css
+emplopyeeDao.deleteById(1);
+```
+
+**(2)、**根据条件删除：
+
+```jsx
+Map<String,Object> columnMap = new HashMap<>();
+columnMap.put("gender",0);
+columnMap.put("age",18);
+emplopyeeDao.deleteByMap(columnMap);
+```
+
+**注：**该方法与selectByMap类似，将条件封装在columnMap中，然后调用deleteByMap方法，传入columnMap即可，返回值是Integer类型，表示影响的行数。
+
+**(3)、**根据id批量删除：
+
+```csharp
+ List<Integer> idList = new ArrayList<>();
+ idList.add(1);
+ idList.add(2);
+ emplopyeeDao.deleteBatchIds(idList);
+```
+
+**注：**该方法和selectBatchIds类似，把需要删除的记录的id装进idList，然后调用deleteBatchIds，传入idList即可。
+
 
 
 ##  12 为项目添加Swagger测试接口
@@ -1214,3 +1330,53 @@ public class Swagger2 {
 
 比如：http://localhost:8080/swagger-ui.html#!/
 
+##  13   数据库插入时出错
+
+> ERROR 2848 --- [nio-8080-exec-7] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is org.springframework.dao.DataIntegrityViolationException: 
+>
+> Error updating database.  Cause: java.sql.SQLException: Field 'id' doesn't have a default value
+>
+> The error may exist in com/mybatisplus/demo/testmybatisplus/mapper/UserMapper.java (best guess)
+>
+> The error may involve com.mybatisplus.demo.testmybatisplus.mapper.UserMapper.insert-Inline
+>
+> The error occurred while setting parameters
+>
+> SQL: INSERT INTO user  ( name, email, age )  VALUES  ( ?, ?, ? )
+>
+> Cause: java.sql.SQLException: Field 'id' doesn't have a default value
+>
+> ; Field 'id' doesn't have a default value; nested exception is java.sql.SQLException: Field 'id' doesn't have a default value] with root cause
+
+因为数据库的id字段没有设置为自增的，所有插入的时候报错。
+
+
+
+##   14  Swagger生成的接口不显示具体的属性值
+
+在API中，Controller传入的参数如果是个类对象，应该在API接口显示具体的属性值，如下所示，调试了很久，发现时swagger依赖包的版本问题，引入下面的2.7.0包就不会有这个问题
+
+```xml
+  <!--Swagger-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+```
+
+Response Content Type    */* 
+
+#### Parameters
+
+| Parameter | Value | Description | Parameter Type | Data Type |
+| :-------- | :---- | :---------- | :------------- | :-------- |
+| id        |       |             | query          | integer   |
+| name      |       |             | query          | string    |
+| age       |       |             | query          | integer   |
+| email     |       |             | query          | string    |

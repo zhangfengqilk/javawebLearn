@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: mybatisplus
+  #配置数据库
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://127.0.0.1:3306/testmybatisplus?useUnicode=true&characterEncoding=utf8
+    username: root
+    password: root
